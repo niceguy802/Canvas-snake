@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>贪吃蛇</title>
+  <style>
+    #myCanvas {
+      background-color: #369;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+</body>
+<script>
+  var myCanvas = document.getElementById("myCanvas");
+  var ctx = myCanvas.getContext('2d');
+
+  var snakeTimer = null;
+  function make() {
+    for (var i = 0; i < 400; i += 20) {
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i, 400);
+      ctx.moveTo(0, i);
+      ctx.lineTo(400, i);
+      ctx.stroke();
+    }
+  }
+
+  make();
+
+  var snake = [45, 44, 43];
+
+  var food = 58;
+  var colors = ["#f63", "#3f6", "#369"];//蛇、食物、背景
+  var direction = 1;
+
+
+  function block(id, c) {
+    ctx.beginPath();
+    ctx.fillStyle = colors[c];
+    x = id % 20 * 20;
+    y = parseInt(id / 20) * 20;
+    ctx.fillRect(x + 1, y + 1, 18, 18);
+    // ctx.rect(x, y, 20, 20);
+    // ctx.fill();
+    // ctx.stroke();
+
+  }
+  block(food, 1);
+
+  // 画蛇
+  function makeSnake() {
+    for (var i in snake) {
+      block(snake[i], 0);
+    }
+  }
+
+  clearInterval(snakeTimer);
+  snakeTimer = setInterval(function () {
+    var next = snake[0] + direction;
+    // 是否穿过身体
+    var a4 = snake.indexOf(next) != -1;
+    snake.unshift(next);
+    if (snake.length >= 200) {
+      clearInterval(snakeTimer);
+      alert("恭喜您，通关啦!");
+    }
+    if (snake[0] == food) {
+      do {
+        // 生成新食物
+        food = parseInt(Math.random() * 400);
+        // 不能吃自己
+      } while (snake.indexOf(food) != -1);
+      block(food, 1);
+    } else {
+      block(snake.pop(), 2);
+    }
+
+    // 是否穿墙
+    var a1 = next < 0 || next > 399;
+    var a2 = next % 20 == 0 && direction == 1;
+    var a3 = next % 20 == 19 && direction == -1;
+    if (a1 || a2 || a3 || a4) {
+      clearInterval(snakeTimer);
+      alert("Game Over!");
+      return;
+    }
+
+    document.onkeyup = function (event) {
+      var direction1 = [-1, -20, 1, 20][event.keyCode - 37];
+      if (!(-direction1 == direction)) {
+        direction = direction1;
+      }
+    }
+    // ❀蛇
+    makeSnake();
+  }, 300)
+
+
+</script>
+
+</html>
